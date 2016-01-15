@@ -13,8 +13,46 @@ CHIP Mux {
     IN a, b, sel;
     OUT out;
 
+    /** Arithmetics
+
+    Look at each row where the output
+    is 1, and figure out an expression
+    where this is true for only this row.
+
+    Then do the same for every other row
+    where output is 1.
+
+    Finally, OR them together.
+
+	Result:
+		
+		(NOT(a) AND b AND sel) OR
+		(a AND NOT(b) AND NOT(sel)) OR
+		(a AND b AND NOT(sel)) OR
+		(a AND b AND sel)
+
+    */
     PARTS:
-    And (a=a, b=b, out=anOut);
-    Or  (a=a, b=b, out=orOut);
-    Mux (a=andOut, b=orOut, sel=sel, out=out);
+    	// Option 1
+    	Not(in=a, out=notA);
+    	Not(in=b, out=notB);
+    	Not(in=sel, out=notSel);
+
+    	And(a=notA, b=b, out=andBNotA);
+    	And(a=andBNotA, b=sel, out=opt1);
+
+    	// Option 2
+    	And(a=a, b=notB, out=andANotB);
+    	And(a=notSel, b=andANotB, out=opt2);
+
+    	// Option 3
+    	And(a=a, b=b, out=andAB);
+    	And(a=andAB, b=notSel, out=opt3);
+
+    	// Option 4
+    	And(a=andAB, b=sel, out=opt4);
+
+    	Or(a=opt1, b=opt2, out=out1);
+    	Or(a=out1, b=opt3, out=out2);
+    	Or(a=out2, b=opt4, out=out);
 }

@@ -1,0 +1,22 @@
+# Chip tests
+echo "Testing all chips.."
+
+SIM="/home/marcus/nand2tetris/tools/HardwareSimulator.sh"
+
+$SIM Not.tst &&
+$SIM And.tst &&
+$SIM Or.tst &&
+$SIM Xor.tst &&
+$SIM Mux.tst &&
+$SIM DMux.tst &&
+$SIM Not16.tst &&
+$SIM And16.tst &&
+$SIM Or16.tst &&
+$SIM Mux16.tst &&
+$SIM Or8Way.tst &&
+$SIM Mux4Way16.tst &&
+$SIM Mux8Way16.tst &&
+$SIM DMux4Way.tst &&
+$SIM DMux8Way.tst
+
+echo "Complete"
