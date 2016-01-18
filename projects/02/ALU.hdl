@@ -42,5 +42,5 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+        And16(a=x, b=zx, out=x1);
 }
