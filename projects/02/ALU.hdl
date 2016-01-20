@@ -27,7 +27,7 @@
 // if (out < 0) set ng = 1
 
 CHIP ALU {
-    IN  
+    IN
         x[16], y[16],  // 16-bit inputs        
         zx, // zero the x input?
         nx, // negate the x input?
@@ -36,11 +36,48 @@ CHIP ALU {
         f,  // compute out = x + y (if 1) or x & y (if 0)
         no; // negate the out output?
 
-    OUT 
+    OUT
         out[16], // 16-bit output
         zr, // 1 if (out == 0), 0 otherwise
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-        And16(a=x, b=zx, out=x1);
+        Not16(in=zeroX, out=notX);
+        Not16(in=zeroY, out=notY);
+
+        // x
+        Mux16(a=x, b=false, sel=zx, out=zeroX);
+        Mux16(a=zeroX, b=notX, sel=nx, out=outX);
+
+        // y
+        Mux16(a=y, b=false, sel=zy, out=zeroY);
+        Mux16(a=zeroY, b=notY, sel=ny, out=outY);
+
+        // f
+        Add16(a=outX, b=outY, out=sumXY);
+        And16(a=outX, b=outY, out=andXY);
+        Mux16(a=andXY, b=sumXY, sel=f, out=outF);
+
+        // no
+        Not16(in=outF, out=notOutF);
+        Mux16(a=outF, b=notOutF, sel=no, out=out);
+
+        // Three copies of the output, as we can't
+        // connect to multiple destinations..
+        Mux16(a=outF, b=notOutF, sel=no, out=outTmp);
+        Mux16(a=outF, b=notOutF, sel=no, out[0..7]=outTmp1);
+        Mux16(a=outF, b=notOutF, sel=no, out[8..15]=outTmp2);
+
+        // zr
+        // OR all of the bits; if one of
+        // them is 1, we'll smoke it out.
+        Or8Way(in=outTmp1, out=zr1);
+        Or8Way(in=outTmp2, out=zr2);
+        Or(a=zr1, b=zr2, out=zr3);
+        Not(in=zr3, out=zr);
+
+        // ng
+        // We'll utilize the fact that, in a
+        // negative number the last bit is always 1.
+        And16(a=outTmp, b=true, out[15]=ng);
 }
