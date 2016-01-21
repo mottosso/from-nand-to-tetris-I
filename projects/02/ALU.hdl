@@ -60,13 +60,10 @@ CHIP ALU {
 
         // no
         Not16(in=outF, out=notOutF);
-        Mux16(a=outF, b=notOutF, sel=no, out=out);
-
-        // Three copies of the output, as we can't
-        // connect to multiple destinations..
-        Mux16(a=outF, b=notOutF, sel=no, out=outTmp);
-        Mux16(a=outF, b=notOutF, sel=no, out[0..7]=outTmp1);
-        Mux16(a=outF, b=notOutF, sel=no, out[8..15]=outTmp2);
+        Mux16(a=outF, b=notOutF, sel=no, out=out,
+                                         out=outTmp,
+                                         out[0..7]=outTmp1,
+                                         out[8..15]=outTmp2);
 
         // zr
         // OR all of the bits; if one of
