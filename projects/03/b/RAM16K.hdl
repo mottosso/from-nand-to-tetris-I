@@ -15,5 +15,21 @@ CHIP RAM16K {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    	// Setup RAM
+    	RAM4K(in=in, load=load1, address=address[0..11], out=ram1);
+    	RAM4K(in=in, load=load2, address=address[0..11], out=ram2);
+    	RAM4K(in=in, load=load3, address=address[0..11], out=ram3);
+    	RAM4K(in=in, load=load4, address=address[0..11], out=ram4);
+
+    	// Pick a RAM based on the current address
+    	Mux4Way16(a=ram1, b=ram2, c=ram3, d=ram4, sel=address[12..13], out=out);
+
+    	// Load RAM, but only if:
+    	//   (1) the load-bit is set
+    	//   (2) the RAM corresponds to the current address
+    	DMux4Way(in=load, sel=address[12..13], a=load1,
+    								           b=load2,
+    								           c=load3,
+    								           d=load4);
+
 }

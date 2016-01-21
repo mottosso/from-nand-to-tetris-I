@@ -12,9 +12,21 @@
  */
 
 CHIP PC {
-    IN in[16],load,inc,reset;
+    IN in[16], load, inc, reset;
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    	// Calculate incremented value
+    	Inc16(in=preval, out=incremented);
+
+    	// Calculate resetted value
+    	Mux16(a=preval, b=false, sel=reset, out=resetted);
+
+        // Dermine whether to reset or increment
+        Mux16(a=preval, b=incremented, sel=inc, out=out1);
+        Mux16(a=out1, b=in, sel=load, out=out2);
+        Mux16(a=out2, b=resetted, sel=reset, out=out3);
+
+    	// Output
+    	Register(in=out3, load=true, out=preval, out=out);
 }
